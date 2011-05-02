@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.iminurnetz</groupId>
+	<artifactId>bukkit.persistence-plugin</artifactId>
+	<name>persistence-plugin</name>
+	<version>0.0.1</version>
+	<packaging>jar</packaging>
+	<description>A basic plugin to demonstrate the use of persistence within Bukkit</description>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<ebean.version>2.7.3</ebean.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>javax.persistence</groupId>
+			<artifactId>persistence-api</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.avaje</groupId>
+			<artifactId>ebean</artifactId>
+			<version>${ebean.version}</version>
+		</dependency>
+		<dependency>
+				<groupId>mysql</groupId>
+				<artifactId>mysql-connector-java</artifactId>
+				<version>5.1.14</version>
+		</dependency>
+		<dependency>
+				<groupId>org.bukkit</groupId>
+				<artifactId>bukkit</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+				<type>jar</type>
+				<scope>compile</scope>
+		</dependency>
+
+		<!-- Test dependencies -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.5</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+	<repositories>
+		<repository>
+			<id>avaje.org</id>
+			<url>http://www.avaje.org/archiva/repository/internal</url>
+		</repository>
+	</repositories>
+
+
+	<!-- Enhance the test classes -->
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+					<verbose>true</verbose>
+					<fork>true</fork>
+					<compilerVersion>1.5</compilerVersion>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<useSystemClassLoader>false</useSystemClassLoader>
+				</configuration>
+			</plugin>			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>compile</id>
+						<phase>process-ebean-enhancement</phase>
+						<configuration>
+							<tasks>
+								<property name="compile_classpath" refid="maven.compile.classpath" />
+								<echo
+									message="Ebean enhancing test classes debug level -----------------------------------" />
+								<echo message="Classpath: ${compile_classpath}" />
+								<taskdef name="ebeanEnhance"
+									classname="com.avaje.ebean.enhance.ant.AntEnhanceTask"
+									classpath="${compile_classpath}" />
+								<ebeanEnhance classSource="${project.build.testOutputDirectory}"
+									packages="test.model.**" transformArgs="debug=1" />
+							</tasks>
+							<encoding>UTF-8</encoding>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>
