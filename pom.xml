@@ -40,8 +40,7 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.5</version>
-			<scope>test</scope>
+			<version>4.8.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bukkit</groupId>
@@ -71,16 +70,65 @@
 
 	<!-- Enhance the test classes -->
 	<build>
+		<finalName>${name}-${version}-b${buildNumber}</finalName>
+		<filters>
+				<filter>src/main/resources/version.properties</filter>
+        </filters>
+		<resources>
+				<resource>
+						<directory>src/main/resources</directory>
+						<filtering>true</filtering>
+				</resource>
+		</resources>
 		<plugins>
+		    <plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
+				<version>1.0</version>
+				<configuration>
+				  <format>{0,number}.{1,date,yyyyMMdd}</format>
+				  <items>
+					<item>buildNumber0</item>
+				    <item>timestamp</item>
+				  </items>
+				</configuration>
+				<executions>
+				  <execution>
+					<phase>validate</phase>
+					<goals>
+					  <goal>create</goal>
+					</goals>
+				  </execution>
+				</executions>
+			</plugin>
+		    <plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.5</version>
+				<executions>
+						<execution>
+								<id>add-source</id>
+								<phase>generate-sources</phase>
+								<goals>
+										<goal>add-source</goal>
+								</goals>
+								<configuration>
+										<sources>
+												<source>build/src/java</source>
+										</sources>
+								</configuration>
+						</execution>
+				</executions>
+		    </plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
+					<source>1.6</source>
+					<target>1.6</target>
 					<verbose>true</verbose>
 					<fork>true</fork>
-					<compilerVersion>1.5</compilerVersion>
+					<compilerVersion>1.6</compilerVersion>
 					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
@@ -120,4 +168,8 @@
 			</plugin>
 		</plugins>
 	</build>
+	<scm>
+		<url>scm:git:github.com:sunkid/PersistencePlugin.git</url>
+		<connection>scm:git:github.com:sunkid/PersistencePlugin.git</connection>
+	</scm>
 </project>

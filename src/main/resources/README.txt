@@ -1,6 +1,4 @@
-@project@ v@version@.@minor_version@
-
-@build_date@
+${project} ${buildNumber}
 
 INSTALL and UPGRADE
 

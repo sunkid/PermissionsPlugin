@@ -20,9 +20,9 @@
 # Commercial Use:
 #   Please contact sunkid@iminurnetz.com
 #
-name: @project@
+name: ${project}
 main: com.iminurnetz.bukkit.plugin.persistence.PersistencePlugin
-version: @version@.@minor_version@
+version: ${buildNumber}
 authors: [sunkid <sunkid@iminurnetz.com>]
-website: https://github.com/sunkid/@project@
+website: https://github.com/sunkid/${project}
 commands:
