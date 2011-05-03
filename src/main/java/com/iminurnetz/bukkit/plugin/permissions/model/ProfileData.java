@@ -55,6 +55,10 @@ public class ProfileData {
         return data;
     }
 
+    /**
+     * Retrieve a copy of the stored profile.
+     * @return a de-serialized copy of the stored profile.
+     */
     public Profile getProfile() {
         if (getData() == null) {
             return new Profile();
@@ -73,6 +77,10 @@ public class ProfileData {
         return null;
     }
 
+    /**
+     * Set the profile data for storage in the DB. The provided profile is serialized.
+     * @param profile the Profile to store.
+     */
     public void setProfile(Profile profile) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ObjectOutputStream oos;

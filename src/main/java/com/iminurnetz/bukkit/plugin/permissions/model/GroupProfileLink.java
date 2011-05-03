@@ -4,7 +4,8 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 /**
- * This entity represents the link table between groups and profiles. 
+ * This entity represents the link table between groups and profiles. This table is maintained by the
+ * {@link GroupDataPersistAdapter} adapter.
  */
 @Entity
 @Table(name = "group_profile_link")

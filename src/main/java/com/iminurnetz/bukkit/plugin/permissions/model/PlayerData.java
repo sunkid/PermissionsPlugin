@@ -60,6 +60,11 @@ public class PlayerData {
         }
     }
 
+    /**
+     * The world-specific list of groups that this player belongs to. In an ideal world,
+     * these would be maintained by a many-to-many relationship. Alas, there is no good support for
+     * the order of lists in ebean.
+     */
     @Transient
     private Map<WorldData, List> groups;
 

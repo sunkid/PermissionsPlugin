@@ -4,7 +4,8 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 /**
- * This entity represents the link table between players and groups. 
+ * This entity represents the link table between players and groups. This table is maintained by the
+ * {@link GroupDataPersistAdapter} and {@link PlayerDataPersistAdapter} adapters.
  */
 @Entity
 @Table(name = "player_group_link")

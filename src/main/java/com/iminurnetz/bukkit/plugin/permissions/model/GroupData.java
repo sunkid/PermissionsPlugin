@@ -46,9 +46,19 @@ public class GroupData {
         this.name = name;
     }
 
+    /**
+     * The world-specific set of players that belong to this group. In an ideal world,
+     * these would be maintained by a many-to-many relationship. Alas, there is no good support for
+     * the order of lists in ebean.
+     */
     @Transient
     private Map<WorldData, Set> players;
     
+    /**
+     * The world-specific list of profiles that are associated with this group. In an ideal world,
+     * these would be maintained by a many-to-many relationship. Alas, there is no good support for
+     * the order of lists in ebean.
+     */
     @Transient
     private Map<WorldData, List> profiles;
     
