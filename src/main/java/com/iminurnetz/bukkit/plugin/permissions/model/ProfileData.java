@@ -1,4 +1,4 @@
-package com.iminurnetz.bukkit.plugin.persistence.model;
+package com.iminurnetz.bukkit.plugin.permissions.model;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -14,7 +14,7 @@ import javax.persistence.Lob;
 import javax.persistence.Table;
 import javax.persistence.Column;
 
-import com.iminurnetz.bukkit.plugin.persistence.Profile;
+import com.iminurnetz.bukkit.plugin.permissions.Profile;
 
 @Entity
 @Table(name = "profile_data")

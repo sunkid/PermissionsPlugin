@@ -1,4 +1,4 @@
-package com.iminurnetz.bukkit.plugin.persistence;
+package com.iminurnetz.bukkit.plugin.permissions;
 
 import java.util.Date;
 import java.util.List;
@@ -8,12 +8,12 @@ import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
 import com.avaje.ebean.EbeanServer;
-import com.iminurnetz.bukkit.plugin.persistence.model.PlayerData;
+import com.iminurnetz.bukkit.plugin.permissions.model.PlayerData;
 
-public class PersistencePlayerListener extends PlayerListener {
+public class PermissionsPlayerListener extends PlayerListener {
     
-    private final PersistencePlugin plugin;
-    public PersistencePlayerListener(PersistencePlugin plugin) {
+    private final PermissionsPlugin plugin;
+    public PermissionsPlayerListener(PermissionsPlugin plugin) {
         this.plugin = plugin;
     }
     

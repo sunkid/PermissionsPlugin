@@ -1,4 +1,4 @@
-package com.iminurnetz.bukkit.plugin.persistence;
+package com.iminurnetz.bukkit.plugin.permissions;
 
 import java.io.Serializable;
 import java.util.HashMap;

@@ -3,11 +3,11 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.iminurnetz</groupId>
-	<artifactId>bukkit.persistence-plugin</artifactId>
-	<name>persistence-plugin</name>
+	<artifactId>bukkit.permissions-plugin</artifactId>
+	<name>permissions-plugin</name>
 	<version>0.0.1</version>
 	<packaging>jar</packaging>
-	<description>A basic plugin to demonstrate the use of persistence within Bukkit</description>
+	<description>A basic plugin to demonstrate the use of permissions within Bukkit</description>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -158,7 +158,7 @@
 							<goal>enhance</goal>
 						</goals>
 						<configuration>
-							<packages>com.iminurnetz.bukkit.plugin.persistence.model</packages>
+							<packages>com.iminurnetz.bukkit.plugin.permissions.model</packages>
 							<transformArgs>debug=2</transformArgs>
 						</configuration>
 					</execution>
@@ -167,7 +167,7 @@
 		</plugins>
 	</build>
 	<scm>
-		<url>scm:git:github.com:sunkid/PersistencePlugin.git</url>
-		<connection>scm:git:github.com:sunkid/PersistencePlugin.git</connection>
+		<url>scm:git:github.com:sunkid/PermissionsPlugin.git</url>
+		<connection>scm:git:github.com:sunkid/PermissionsPlugin.git</connection>
 	</scm>
 </project>

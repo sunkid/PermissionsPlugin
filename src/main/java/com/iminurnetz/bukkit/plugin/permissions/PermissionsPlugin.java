@@ -1,4 +1,4 @@
-package com.iminurnetz.bukkit.plugin.persistence;
+package com.iminurnetz.bukkit.plugin.permissions;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,18 +23,18 @@ import com.avaje.ebean.EbeanServer;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.ddl.DdlGenerator;
 import com.iminurnetz.bukkit.plugin.BukkitPlugin;
-import com.iminurnetz.bukkit.plugin.persistence.model.adapters.PlayerDataPersistAdapter;
-import com.iminurnetz.bukkit.plugin.persistence.model.ProfileData;
-import com.iminurnetz.bukkit.plugin.persistence.model.WorldData;
+import com.iminurnetz.bukkit.plugin.permissions.model.ProfileData;
+import com.iminurnetz.bukkit.plugin.permissions.model.WorldData;
+import com.iminurnetz.bukkit.plugin.permissions.model.adapters.PlayerDataPersistAdapter;
 
-public class PersistencePlugin extends BukkitPlugin {
+public class PermissionsPlugin extends BukkitPlugin {
 
     @Override
     public void enablePlugin() throws Exception {
          installDDL();
          PluginManager pm = getServer().getPluginManager();
          
-         PersistencePlayerListener playerListener = new PersistencePlayerListener(this);
+         PermissionsPlayerListener playerListener = new PermissionsPlayerListener(this);
          pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener, Priority.Monitor, this);
          pm.registerEvent(Event.Type.PLAYER_TELEPORT, playerListener, Priority.Monitor, this);
          

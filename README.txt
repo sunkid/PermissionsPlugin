@@ -1,3 +1,3 @@
-PersistencePlugin
+PermissionsPlugin
 
-A simple plugin to demonstrate the use of persistence in Bukkit.
+A simple plugin to demonstrate the use of permissions and persistence in Bukkit.

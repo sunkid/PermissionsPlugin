@@ -1,4 +1,4 @@
-package com.iminurnetz.bukkit.plugin.persistence.model;
+package com.iminurnetz.bukkit.plugin.permissions.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;

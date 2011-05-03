@@ -1,4 +1,4 @@
-package com.iminurnetz.bukkit.plugin.persistence.model.adapters;
+package com.iminurnetz.bukkit.plugin.permissions.model.adapters;
 
 import java.util.List;
 import java.util.Map;
@@ -6,11 +6,11 @@ import java.util.Map;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.event.BeanPersistAdapter;
 import com.avaje.ebean.event.BeanPersistRequest;
-import com.iminurnetz.bukkit.plugin.persistence.model.GroupData;
-import com.iminurnetz.bukkit.plugin.persistence.model.GroupProfileLink;
-import com.iminurnetz.bukkit.plugin.persistence.model.PlayerGroupLink;
-import com.iminurnetz.bukkit.plugin.persistence.model.ProfileData;
-import com.iminurnetz.bukkit.plugin.persistence.model.WorldData;
+import com.iminurnetz.bukkit.plugin.permissions.model.GroupData;
+import com.iminurnetz.bukkit.plugin.permissions.model.GroupProfileLink;
+import com.iminurnetz.bukkit.plugin.permissions.model.PlayerGroupLink;
+import com.iminurnetz.bukkit.plugin.permissions.model.ProfileData;
+import com.iminurnetz.bukkit.plugin.permissions.model.WorldData;
 
 public class GroupDataPersistAdapter extends BeanPersistAdapter {
 
