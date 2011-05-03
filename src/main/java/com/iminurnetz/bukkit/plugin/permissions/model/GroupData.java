@@ -1,7 +1,9 @@
 package com.iminurnetz.bukkit.plugin.permissions.model;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -13,17 +15,23 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.persistence.Version;
+
+import com.iminurnetz.bukkit.plugin.permissions.util.ListChangeInterceptor;
 
 /**
  * This entity represents a group with a set of world-specific players and a list of world-specific profiles. 
  */
 @Entity
 @Table(name = "group_data")
-public class GroupData {
+public class GroupData  implements ListChangeInterceptor {
     @Id
     private int groupId;
     @Column(unique=true, nullable=false)
     private String name;
+    
+    @Version
+    private Timestamp lastUpdate;
 
     public GroupData() {
         players = new HashMap<WorldData, Set>();
@@ -44,6 +52,14 @@ public class GroupData {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void setLastUpdate(Timestamp lastUpdate) {
+        this.lastUpdate = lastUpdate;
+    }
+
+    public Timestamp getLastUpdate() {
+        return lastUpdate;
     }
 
     /**
@@ -70,6 +86,13 @@ public class GroupData {
         this.players = players;
     }
     
+    public Set<PlayerData> getPlayers(WorldData world) {
+        if (!players.containsKey(world)) {
+            players.put(world, new HashSet<PlayerData>());
+        }
+        return players.get(world);
+    }
+
     public void addPlayers(WorldData world, List<PlayerData> thePlayers) {
         if (!players.containsKey(world)) {
             players.put(world, new HashSet<PlayerData>());
@@ -83,6 +106,7 @@ public class GroupData {
 
     public void setProfiles(Map<WorldData, List> profiles) {
         this.profiles = profiles;
+        callPostIntercept();
     }
 
     public Map<WorldData, List> getProfiles() {
@@ -93,20 +117,17 @@ public class GroupData {
         if (!profiles.containsKey(world)) {
             List<ProfileData> l = new ArrayList<ProfileData>();
             profiles.put(world, l);
+            callPostIntercept();
         }
         return profiles.get(world);
     }
     
     public void setProfiles(WorldData world, List<ProfileData> profiles) {
         this.profiles.put(world, profiles);
+        callPostIntercept();
     }
 
-    public Set<PlayerData> getPlayers(WorldData world) {
-        if (!players.containsKey(world)) {
-            players.put(world, new HashSet<PlayerData>());
-        }
-        return players.get(world);
+    public void callPostIntercept() {
+        setLastUpdate(new Timestamp(new Date().getTime()));
     }
-
-
 }
