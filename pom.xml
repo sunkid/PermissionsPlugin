@@ -33,7 +33,7 @@
 		<dependency>
 				<groupId>org.bukkit</groupId>
 				<artifactId>bukkit</artifactId>
-				<version>0.0.1-SNAPSHOT</version>
+				<version>0.0.1-PERMISSIONS</version>
 				<type>jar</type>
 				<scope>compile</scope>
 		</dependency>
@@ -81,6 +81,13 @@
 				</resource>
 		</resources>
 		<plugins>
+			<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<configuration>
+							<useSystemClassLoader>false</useSystemClassLoader>
+					</configuration>
+			</plugin> 
 		    <plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>buildnumber-maven-plugin</artifactId>
@@ -140,29 +147,20 @@
 				</configuration>
 			</plugin>			
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
+				<groupId>org.avaje</groupId>
+				<artifactId>ebean-maven-enhancement-plugin</artifactId>
+				<version>${ebean.version}</version>
 				<executions>
 					<execution>
-						<id>compile</id>
-						<phase>process-ebean-enhancement</phase>
-						<configuration>
-							<tasks>
-								<property name="compile_classpath" refid="maven.compile.classpath" />
-								<echo
-									message="Ebean enhancing test classes debug level -----------------------------------" />
-								<echo message="Classpath: ${compile_classpath}" />
-								<taskdef name="ebeanEnhance"
-									classname="com.avaje.ebean.enhance.ant.AntEnhanceTask"
-									classpath="${compile_classpath}" />
-								<ebeanEnhance classSource="${project.build.testOutputDirectory}"
-									packages="test.model.**" transformArgs="debug=1" />
-							</tasks>
-							<encoding>UTF-8</encoding>
-						</configuration>
+						<id>main</id>
+						<phase>process-classes</phase>
 						<goals>
-							<goal>run</goal>
+							<goal>enhance</goal>
 						</goals>
+						<configuration>
+							<packages>com.iminurnetz.bukkit.plugin.persistence.model</packages>
+							<transformArgs>debug=2</transformArgs>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
