@@ -12,7 +12,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 @Entity
-@Table(name = "player")
+@Table(name = "player_data")
 public class PlayerData {
     @Id
     private int playerId;
@@ -20,11 +20,9 @@ public class PlayerData {
 
     private Date lastLogin;
     
-    @Transient
-    private Map<WorldData, List<GroupData>> groups;
     
     public PlayerData() {
-        groups = new HashMap<WorldData, List<GroupData>>();
+        groups = new HashMap<WorldData, List>();
     }
 
     public int getPlayerId() {
@@ -51,22 +49,29 @@ public class PlayerData {
         this.lastLogin = lastLogin;
     }
 
+    public void joinGroups(WorldData world, List<GroupData> groups) {
+        for (GroupData group : groups) {
+            group.addPlayer(world, this);
+        }
+    }
+
+    @Transient
+    private Map<WorldData, List> groups;
+
     public void setGroups(HashMap<WorldData, List<GroupData>> groupMap) {
-        groups = new HashMap<WorldData, List<GroupData>>();
+        groups = new HashMap<WorldData, List>();
         for (WorldData world : groupMap.keySet()) {
             setGroups(world, groupMap.get(world));
         }
     }
 
-    public Map<WorldData, List<GroupData>> getGroups() {
+    public Map<WorldData, List> getGroups() {
         return groups;
     }
 
     public void setGroups(WorldData world, List<GroupData> groups) {
         this.groups.put(world, groups);
-        for (GroupData group : groups) {
-            group.addPlayer(world, this);
-        }
+        joinGroups(world, groups);
     }
     
     public List<GroupData> getGroups(WorldData world) {
@@ -75,4 +80,5 @@ public class PlayerData {
         }
         return groups.get(world);
     }
+
 }

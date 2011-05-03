@@ -42,11 +42,11 @@ public class GroupDataPersistAdapter extends BeanPersistAdapter {
 
     private void persistGroupProfileLink(BeanPersistRequest<?> request) {
         GroupData g = (GroupData) request.getBean();
-        Map<WorldData, List<ProfileData>> profiles = g.getProfiles();
+        Map<WorldData, List> profiles = g.getProfiles();
         int rankOrder = 0;
         GroupProfileLink theLink = null;
         for (WorldData world : profiles.keySet()) {
-            for (ProfileData profile : profiles.get(world)) {
+            for (ProfileData profile : (List<ProfileData>) profiles.get(world)) {
                 List<GroupProfileLink> links = server.createQuery(GroupProfileLink.class)
                                                         .where()
                                                         .eq("group_id", g.getGroupId())

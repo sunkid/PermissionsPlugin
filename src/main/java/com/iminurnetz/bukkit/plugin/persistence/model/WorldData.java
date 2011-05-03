@@ -5,7 +5,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "world")
+@Table(name = "world_data")
 public class WorldData {
     @Id
     private int worldId;

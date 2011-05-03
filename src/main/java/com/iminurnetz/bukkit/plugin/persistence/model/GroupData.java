@@ -14,21 +14,15 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 @Entity
-@Table(name = "group")
+@Table(name = "group_data")
 public class GroupData {
     @Id
     private int groupId;
     private String name;
 
-    @Transient
-    private Map<WorldData, Set<PlayerData>> players;
-    
-    @Transient
-    private Map<WorldData, List<ProfileData>> profiles;
-    
     public GroupData() {
-        players = new HashMap<WorldData, Set<PlayerData>>();
-        profiles = new HashMap<WorldData, List<ProfileData>>();
+        players = new HashMap<WorldData, Set>();
+        profiles = new HashMap<WorldData, List>();
     }
     
     public int getGroupId() {
@@ -47,11 +41,17 @@ public class GroupData {
         this.name = name;
     }
 
-    public Map<WorldData, Set<PlayerData>> getPlayers() {
+    @Transient
+    private Map<WorldData, Set> players;
+    
+    @Transient
+    private Map<WorldData, List> profiles;
+    
+    public Map<WorldData, Set> getPlayers() {
         return players;
     }
 
-    public void setPlayers(Map<WorldData, Set<PlayerData>> players) {
+    public void setPlayers(Map<WorldData, Set> players) {
         this.players = players;
     }
     
@@ -66,11 +66,11 @@ public class GroupData {
         addPlayers(world, Arrays.asList(player));
     }
 
-    public void setProfiles(Map<WorldData, List<ProfileData>> profiles) {
+    public void setProfiles(Map<WorldData, List> profiles) {
         this.profiles = profiles;
     }
 
-    public Map<WorldData, List<ProfileData>> getProfiles() {
+    public Map<WorldData, List> getProfiles() {
         return profiles;
     }
     
@@ -92,4 +92,6 @@ public class GroupData {
         }
         return players.get(world);
     }
+
+
 }

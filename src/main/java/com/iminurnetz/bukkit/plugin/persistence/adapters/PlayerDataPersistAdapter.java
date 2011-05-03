@@ -39,11 +39,11 @@ public class PlayerDataPersistAdapter extends BeanPersistAdapter {
     
     private void persistPlayerGroupLink(BeanPersistRequest<?> request) {
         PlayerData p = (PlayerData) request.getBean();
-        Map<WorldData, List<GroupData>> groups = p.getGroups();
+        Map<WorldData, List> groups = p.getGroups();
         int rankOrder = 0;
         PlayerGroupLink theLink = null;
         for (WorldData world : groups.keySet()) {
-            for (GroupData group : groups.get(world)) {
+            for (GroupData group : (List<GroupData>) groups.get(world)) {
                 List<PlayerGroupLink> links = server.createQuery(PlayerGroupLink.class)
                                                         .where()
                                                         .eq("player_id", p.getPlayerId())
