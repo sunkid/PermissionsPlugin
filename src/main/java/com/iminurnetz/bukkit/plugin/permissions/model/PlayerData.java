@@ -14,7 +14,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.Version;
 
-import com.iminurnetz.bukkit.plugin.permissions.util.ListChangeInterceptor;
+import com.iminurnetz.bukkit.plugin.permissions.util.ListChangeMonitor;
 import com.iminurnetz.bukkit.plugin.permissions.util.MonitoredList;
 
 /**
@@ -22,7 +22,7 @@ import com.iminurnetz.bukkit.plugin.permissions.util.MonitoredList;
  */
 @Entity
 @Table(name = "player_data")
-public class PlayerData implements ListChangeInterceptor {
+public class PlayerData implements ListChangeMonitor {
     @Id
     private int playerId;
     @Column(unique=true, nullable=false)
@@ -83,7 +83,7 @@ public class PlayerData implements ListChangeInterceptor {
         for (WorldData world : groupMap.keySet()) {
             setGroups(world, groupMap.get(world));
         }
-        callPostIntercept();
+        onMonitoredListChange();
     }
 
     public Map<WorldData, List> getGroups() {
@@ -95,18 +95,18 @@ public class PlayerData implements ListChangeInterceptor {
         for (GroupData group : groups) {
             group.addPlayer(world, this);
         }
-        callPostIntercept();
+        onMonitoredListChange();
     }
     
     public List<GroupData> getGroups(WorldData world) {
         if (!groups.containsKey(world)) {
             groups.put(world, new MonitoredList<GroupData>(new ArrayList<GroupData>(), this));
-            callPostIntercept();
+            onMonitoredListChange();
         }
         return groups.get(world);
     }
 
-    public void callPostIntercept() {
+    public void onMonitoredListChange() {
         setLastUpdate(new Timestamp(new Date().getTime()));
     }
 

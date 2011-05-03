@@ -9,9 +9,9 @@ import java.util.ListIterator;
 public class MonitoredList<E> implements List<E> {
 
     private List<E> backer;
-    private List<ListChangeInterceptor> interceptors = new LinkedList<ListChangeInterceptor>();
+    private List<ListChangeMonitor> interceptors = new LinkedList<ListChangeMonitor>();
 
-    public MonitoredList(List<E> backer, ListChangeInterceptor interceptor) {
+    public MonitoredList(List<E> backer, ListChangeMonitor interceptor) {
         this.backer = backer;
         interceptors.add(interceptor);
     }
@@ -75,16 +75,16 @@ public class MonitoredList<E> implements List<E> {
     }
 
     private void callPostIntercepts() {
-        for (ListChangeInterceptor interceptor : interceptors) {
-            interceptor.callPostIntercept();
+        for (ListChangeMonitor interceptor : interceptors) {
+            interceptor.onMonitoredListChange();
         }
     }
 
-    public boolean addInterceptor(ListChangeInterceptor interceptor) {
+    public boolean addInterceptor(ListChangeMonitor interceptor) {
         return interceptors.add(interceptor);
     }
 
-    public boolean removeInterceptor(ListChangeInterceptor interceptor) {
+    public boolean removeInterceptor(ListChangeMonitor interceptor) {
         return interceptors.remove(interceptor);
     }
 

@@ -17,14 +17,14 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.Version;
 
-import com.iminurnetz.bukkit.plugin.permissions.util.ListChangeInterceptor;
+import com.iminurnetz.bukkit.plugin.permissions.util.ListChangeMonitor;
 
 /**
  * This entity represents a group with a set of world-specific players and a list of world-specific profiles. 
  */
 @Entity
 @Table(name = "group_data")
-public class GroupData  implements ListChangeInterceptor {
+public class GroupData  implements ListChangeMonitor {
     @Id
     private int groupId;
     @Column(unique=true, nullable=false)
@@ -106,7 +106,7 @@ public class GroupData  implements ListChangeInterceptor {
 
     public void setProfiles(Map<WorldData, List> profiles) {
         this.profiles = profiles;
-        callPostIntercept();
+        onMonitoredListChange();
     }
 
     public Map<WorldData, List> getProfiles() {
@@ -117,17 +117,17 @@ public class GroupData  implements ListChangeInterceptor {
         if (!profiles.containsKey(world)) {
             List<ProfileData> l = new ArrayList<ProfileData>();
             profiles.put(world, l);
-            callPostIntercept();
+            onMonitoredListChange();
         }
         return profiles.get(world);
     }
     
     public void setProfiles(WorldData world, List<ProfileData> profiles) {
         this.profiles.put(world, profiles);
-        callPostIntercept();
+        onMonitoredListChange();
     }
 
-    public void callPostIntercept() {
+    public void onMonitoredListChange() {
         setLastUpdate(new Timestamp(new Date().getTime()));
     }
 }
