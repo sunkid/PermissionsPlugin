@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.avaje.ebean.EbeanServer;
+import com.avaje.ebean.Transaction;
 import com.avaje.ebean.event.BeanPersistAdapter;
 import com.avaje.ebean.event.BeanPersistRequest;
 import com.iminurnetz.bukkit.plugin.permissions.model.GroupData;
@@ -12,6 +13,9 @@ import com.iminurnetz.bukkit.plugin.permissions.model.PlayerGroupLink;
 import com.iminurnetz.bukkit.plugin.permissions.model.ProfileData;
 import com.iminurnetz.bukkit.plugin.permissions.model.WorldData;
 
+/**
+ * This adapter maintains the link tables between players and groups and between groups and profiles. 
+ */
 public class GroupDataPersistAdapter extends BeanPersistAdapter {
 
     private static EbeanServer server;
@@ -33,14 +37,22 @@ public class GroupDataPersistAdapter extends BeanPersistAdapter {
 
     @Override
     public void postDelete(BeanPersistRequest<?> request) {
+        
+        Transaction transaction = server.beginTransaction();
+        
         GroupData g = (GroupData) request.getBean();
         List<PlayerGroupLink> pgl = server.createQuery(PlayerGroupLink.class).where().eq("group_id", g.getGroupId()).findList();
-        server.delete(pgl);
+        server.delete(pgl, transaction);
         List<GroupProfileLink> ppl = server.createQuery(GroupProfileLink.class).where().eq("group_id", g.getGroupId()).findList();
-        server.delete(ppl);
+        server.delete(ppl, transaction);
+        
+        server.commitTransaction();
     }
 
     private void persistGroupProfileLink(BeanPersistRequest<?> request) {
+        
+        Transaction transaction = server.beginTransaction();
+        
         GroupData g = (GroupData) request.getBean();
         Map<WorldData, List> profiles = g.getProfiles();
         int rankOrder = 0;
@@ -60,9 +72,11 @@ public class GroupDataPersistAdapter extends BeanPersistAdapter {
                 }
                 
                 theLink.setRankOrder(rankOrder++);
-                server.save(theLink);
+                server.save(theLink, transaction);
             }
         }
+        
+        server.commitTransaction();
     }
 
     public static void setServer(EbeanServer server) {

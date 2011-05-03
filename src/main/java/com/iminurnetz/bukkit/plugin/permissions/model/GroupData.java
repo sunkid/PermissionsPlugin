@@ -14,6 +14,9 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+/**
+ * This entity represents a group with a set of world-specific players and a list of world-specific profiles. 
+ */
 @Entity
 @Table(name = "group_data")
 public class GroupData {

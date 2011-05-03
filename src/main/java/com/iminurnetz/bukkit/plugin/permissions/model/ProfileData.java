@@ -16,6 +16,9 @@ import javax.persistence.Column;
 
 import com.iminurnetz.bukkit.plugin.permissions.Profile;
 
+/**
+ * This entity persists profile data as a serialized java object to the database. 
+ */
 @Entity
 @Table(name = "profile_data")
 public class ProfileData {

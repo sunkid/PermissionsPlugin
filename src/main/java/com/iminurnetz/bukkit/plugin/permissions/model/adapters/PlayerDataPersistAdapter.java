@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.List;
 
 import com.avaje.ebean.EbeanServer;
+import com.avaje.ebean.Transaction;
 import com.avaje.ebean.event.BeanPersistAdapter;
 import com.avaje.ebean.event.BeanPersistRequest;
 import com.iminurnetz.bukkit.plugin.permissions.model.GroupData;
@@ -11,6 +12,9 @@ import com.iminurnetz.bukkit.plugin.permissions.model.PlayerData;
 import com.iminurnetz.bukkit.plugin.permissions.model.PlayerGroupLink;
 import com.iminurnetz.bukkit.plugin.permissions.model.WorldData;
 
+/**
+ * This adapter maintains the link tables between players and groups. 
+ */
 public class PlayerDataPersistAdapter extends BeanPersistAdapter {
     
     private static EbeanServer server;
@@ -32,12 +36,20 @@ public class PlayerDataPersistAdapter extends BeanPersistAdapter {
 
     @Override
     public void postDelete(BeanPersistRequest<?> request) {
+        
+        Transaction transaction = server.beginTransaction();
+        
         PlayerData p = (PlayerData) request.getBean();
         List<PlayerGroupLink> links = server.createQuery(PlayerGroupLink.class).where().eq("player_id", p.getPlayerId()).findList();
-        server.delete(links);
+        server.delete(links, transaction);
+        
+        server.commitTransaction();
     }
     
     private void persistPlayerGroupLink(BeanPersistRequest<?> request) {
+        
+        Transaction transaction = server.beginTransaction();
+        
         PlayerData p = (PlayerData) request.getBean();
         Map<WorldData, List> groups = p.getGroups();
         int rankOrder = 0;
@@ -56,9 +68,11 @@ public class PlayerDataPersistAdapter extends BeanPersistAdapter {
                     theLink = new PlayerGroupLink(p.getPlayerId(), group.getGroupId(), world.getWorldId());
                 }
                 theLink.setRankOrder(rankOrder++);
-                server.save(theLink);
+                server.save(theLink, transaction);
             }
         }
+        
+        server.commitTransaction();
     }
 
     public static void setServer(EbeanServer server) {

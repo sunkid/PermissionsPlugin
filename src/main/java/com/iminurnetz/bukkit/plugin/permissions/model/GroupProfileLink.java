@@ -3,6 +3,9 @@ package com.iminurnetz.bukkit.plugin.permissions.model;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+/**
+ * This entity represents the link table between groups and profiles. 
+ */
 @Entity
 @Table(name = "group_profile_link")
 public class GroupProfileLink {

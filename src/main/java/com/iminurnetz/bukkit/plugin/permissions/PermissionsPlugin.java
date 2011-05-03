@@ -3,13 +3,11 @@ package com.iminurnetz.bukkit.plugin.permissions;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.Serializable;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
@@ -23,7 +21,6 @@ import com.avaje.ebean.EbeanServer;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.ddl.DdlGenerator;
 import com.iminurnetz.bukkit.plugin.BukkitPlugin;
-import com.iminurnetz.bukkit.plugin.permissions.model.ProfileData;
 import com.iminurnetz.bukkit.plugin.permissions.model.WorldData;
 import com.iminurnetz.bukkit.plugin.permissions.model.adapters.PlayerDataPersistAdapter;
 
@@ -43,6 +40,9 @@ public class PermissionsPlugin extends BukkitPlugin {
          ensureWorldExists(getServer().getWorlds());
     }
     
+    /**
+     * Retrieves all classes from packages named **.model.** in the plugin's jar file
+     */
     @Override
     public List<Class<?>> getDatabaseClasses() {
         List<Class<?>> classes = new ArrayList<Class<?>>();
@@ -69,6 +69,9 @@ public class PermissionsPlugin extends BukkitPlugin {
         return classes;
     }
     
+    /**
+     * Install the DDL and run the update.sql script included in the plugin's jar file. All SQL errors are ignored.
+     */
     @Override
     public void installDDL() {
         SpiEbeanServer serv = (SpiEbeanServer) getDatabase();
