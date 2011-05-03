@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -18,6 +19,7 @@ import javax.persistence.Transient;
 public class GroupData {
     @Id
     private int groupId;
+    @Column(unique=true, nullable=false)
     private String name;
 
     public GroupData() {

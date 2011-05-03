@@ -9,7 +9,6 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 
 import com.avaje.ebean.EbeanServer;
 import com.iminurnetz.bukkit.plugin.persistence.model.PlayerData;
-import com.iminurnetz.bukkit.plugin.persistence.model.WorldData;
 
 public class PersistencePlayerListener extends PlayerListener {
     

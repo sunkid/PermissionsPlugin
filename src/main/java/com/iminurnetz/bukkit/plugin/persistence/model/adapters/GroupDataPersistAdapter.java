@@ -1,4 +1,4 @@
-package com.iminurnetz.bukkit.plugin.persistence.adapters;
+package com.iminurnetz.bukkit.plugin.persistence.model.adapters;
 
 import java.util.List;
 import java.util.Map;

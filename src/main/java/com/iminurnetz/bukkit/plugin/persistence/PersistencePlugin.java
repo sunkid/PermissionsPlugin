@@ -3,11 +3,13 @@ package com.iminurnetz.bukkit.plugin.persistence;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
@@ -21,7 +23,8 @@ import com.avaje.ebean.EbeanServer;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.ddl.DdlGenerator;
 import com.iminurnetz.bukkit.plugin.BukkitPlugin;
-import com.iminurnetz.bukkit.plugin.persistence.adapters.PlayerDataPersistAdapter;
+import com.iminurnetz.bukkit.plugin.persistence.model.adapters.PlayerDataPersistAdapter;
+import com.iminurnetz.bukkit.plugin.persistence.model.ProfileData;
 import com.iminurnetz.bukkit.plugin.persistence.model.WorldData;
 
 public class PersistencePlugin extends BukkitPlugin {

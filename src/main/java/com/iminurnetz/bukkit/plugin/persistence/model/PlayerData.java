@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -16,6 +17,7 @@ import javax.persistence.Transient;
 public class PlayerData {
     @Id
     private int playerId;
+    @Column(unique=true, nullable=false)
     private String name;
 
     private Date lastLogin;
