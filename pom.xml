@@ -93,6 +93,7 @@
 				<artifactId>buildnumber-maven-plugin</artifactId>
 				<version>1.0</version>
 				<configuration>
+				  <buildNumberPropertiesFileLocation>src/main/resources/buildNumber.properties</buildNumberPropertiesFileLocation>
 				  <format>{0,number}.{1,date,yyyyMMdd}</format>
 				  <items>
 					<item>buildNumber0</item>
