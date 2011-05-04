@@ -124,6 +124,7 @@ public class GroupDataPersistAdapter extends BeanPersistAdapter {
         GroupProfileLink theLink = null;
         for (WorldData world : profiles.keySet()) {
             for (ProfileData profile : (List<ProfileData>) profiles.get(world)) {
+                server.save(profile);
                 theLink = server.createQuery(GroupProfileLink.class)
                                     .where()
                                     .eq("group_id", g.getGroupId())

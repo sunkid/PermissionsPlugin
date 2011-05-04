@@ -88,6 +88,7 @@ public class PlayerDataPersistAdapter extends BeanPersistAdapter {
         PlayerGroupLink theLink = null;
         for (WorldData world : groups.keySet()) {
             for (GroupData group : (List<GroupData>) groups.get(world)) {
+                server.save(group);
                 theLink = server.createQuery(PlayerGroupLink.class)
                                     .where()
                                     .eq("playerId", p.getPlayerId())
@@ -99,7 +100,6 @@ public class PlayerDataPersistAdapter extends BeanPersistAdapter {
                 }
                 theLink.setRankOrder(rankOrder++);
                 server.save(theLink);
-                server.save(group);
             }
         }
     }
