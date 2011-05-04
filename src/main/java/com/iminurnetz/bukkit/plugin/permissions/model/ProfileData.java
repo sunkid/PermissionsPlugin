@@ -5,6 +5,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.Date;
 
 import javax.persistence.Basic;
 import javax.persistence.Entity;
@@ -13,6 +16,7 @@ import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 import javax.persistence.Column;
+import javax.persistence.Version;
 
 import com.iminurnetz.bukkit.plugin.permissions.Profile;
 
@@ -30,6 +34,17 @@ public class ProfileData {
     @Lob
     @Basic(fetch=FetchType.EAGER)
     private byte[] data;
+    
+    @Version
+    @Column(columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    private Timestamp lastUpdate;
+
+    public ProfileData() {
+    }
+    
+    public ProfileData(String name) {
+        this.name = name;
+    }
     
     public int getProfileId() {
         return profileId;
@@ -53,6 +68,14 @@ public class ProfileData {
 
     public byte[] getData() {
         return data;
+    }
+
+    public Timestamp getLastUpdate() {
+        return lastUpdate;
+    }
+
+    public void setLastUpdate(Timestamp lastUpdate) {
+        this.lastUpdate = lastUpdate;
     }
 
     /**
@@ -93,5 +116,18 @@ public class ProfileData {
             e.printStackTrace();
             setData(null);
         }
+        setLastUpdate(new Timestamp(new Date().getTime()));
+    }
+
+    public void put(String permission, Serializable value) {
+        Profile profile = getProfile();
+        profile.getData().put(permission, value);
+        setProfile(profile);
+    }
+
+    public void remove(String permission) {
+        Profile profile = getProfile();
+        profile.getData().remove(permission);
+        setProfile(profile);
     }
 }

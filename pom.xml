@@ -81,13 +81,6 @@
 				</resource>
 		</resources>
 		<plugins>
-			<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-surefire-plugin</artifactId>
-					<configuration>
-							<useSystemClassLoader>false</useSystemClassLoader>
-					</configuration>
-			</plugin> 
 		    <plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>buildnumber-maven-plugin</artifactId>
@@ -141,16 +134,17 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<configuration>
-					<useSystemClassLoader>false</useSystemClassLoader>
-				</configuration>
-			</plugin>			
-			<plugin>
 				<groupId>org.avaje</groupId>
 				<artifactId>ebean-maven-enhancement-plugin</artifactId>
 				<version>${ebean.version}</version>
+				<dependencies>
+					 <dependency>
+						<groupId>org.bukkit</groupId>
+						<artifactId>bukkit</artifactId>
+						<version>0.0.1-PERMISSIONS</version>
+						<type>jar</type>
+					 </dependency>
+				</dependencies>
 				<executions>
 					<execution>
 						<id>main</id>

@@ -4,31 +4,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import com.avaje.ebean.Ebean;
-import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.EbeanServerFactory;
-import com.avaje.ebeaninternal.api.SpiEbeanServer;
-import com.avaje.ebeaninternal.server.ddl.DdlGenerator;
 import com.iminurnetz.bukkit.plugin.permissions.Profile;
 import com.iminurnetz.bukkit.plugin.permissions.model.GroupData;
 import com.iminurnetz.bukkit.plugin.permissions.model.PlayerData;
 import com.iminurnetz.bukkit.plugin.permissions.model.ProfileData;
 import com.iminurnetz.bukkit.plugin.permissions.model.WorldData;
-import com.iminurnetz.bukkit.plugin.permissions.model.adapters.GroupDataPersistAdapter;
-import com.iminurnetz.bukkit.plugin.permissions.model.adapters.PlayerDataPersistAdapter;
 
-public class TestPermissionModel extends TestCase {
+public class TestPermissionModel extends TestUtil {
     
     public TestPermissionModel() {       
-        EbeanServer server = EbeanServerFactory.create("mysql");
-        PlayerDataPersistAdapter.setServer(server);
-        GroupDataPersistAdapter.setServer(server);
-        DdlGenerator gen = ((SpiEbeanServer)server).getDdlGenerator();
-
-        gen.runScript(true, gen.generateDropDdl());
-        gen.runScript(true, gen.generateCreateDdl());
+        super();
     }
 
     public void testPlayerModel() {

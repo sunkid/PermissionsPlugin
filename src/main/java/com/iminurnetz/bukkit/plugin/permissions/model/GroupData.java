@@ -31,6 +31,7 @@ public class GroupData  implements ListChangeMonitor {
     private String name;
     
     @Version
+    @Column(columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Timestamp lastUpdate;
 
     public GroupData() {
@@ -106,7 +107,7 @@ public class GroupData  implements ListChangeMonitor {
 
     public void setProfiles(Map<WorldData, List> profiles) {
         this.profiles = profiles;
-        onMonitoredListChange();
+        postUpdate();
     }
 
     public Map<WorldData, List> getProfiles() {
@@ -117,17 +118,17 @@ public class GroupData  implements ListChangeMonitor {
         if (!profiles.containsKey(world)) {
             List<ProfileData> l = new ArrayList<ProfileData>();
             profiles.put(world, l);
-            onMonitoredListChange();
+            postUpdate();
         }
         return profiles.get(world);
     }
     
     public void setProfiles(WorldData world, List<ProfileData> profiles) {
         this.profiles.put(world, profiles);
-        onMonitoredListChange();
+        postUpdate();
     }
 
-    public void onMonitoredListChange() {
+    public void postUpdate() {
         setLastUpdate(new Timestamp(new Date().getTime()));
     }
 }

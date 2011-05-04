@@ -14,6 +14,8 @@ import com.avaje.ebean.event.BeanPersistRequest;
 import com.iminurnetz.bukkit.plugin.permissions.model.GroupData;
 import com.iminurnetz.bukkit.plugin.permissions.model.PlayerData;
 import com.iminurnetz.bukkit.plugin.permissions.model.PlayerGroupLink;
+import com.iminurnetz.bukkit.plugin.permissions.model.PlayerProfileLink;
+import com.iminurnetz.bukkit.plugin.permissions.model.ProfileData;
 import com.iminurnetz.bukkit.plugin.permissions.model.WorldData;
 
 /**
@@ -41,8 +43,17 @@ public class PlayerDataPersistAdapter extends BeanPersistAdapter {
             groupList.add(server.getReference(GroupData.class, l.getGroupId()));
         }
         
+        Map<WorldData, ProfileData> profiles = new HashMap<WorldData, ProfileData>();
+        ProfileData profile = null;
+        for (PlayerProfileLink l : getPlayerProfileLinks(player)) {
+            world = server.getReference(WorldData.class, l.getWorldId());
+            profile = server.getReference(ProfileData.class, l.getProfileId());
+            profiles.put(world, profile);
+        }
+        
         Timestamp lastUpdate = player.getLastUpdate();
         player.setGroups(groupMap);
+        player.setPlayerProfile(profiles);
         player.setLastUpdate(lastUpdate);        
     }
     
@@ -51,6 +62,14 @@ public class PlayerDataPersistAdapter extends BeanPersistAdapter {
                        .where()
                        .eq("playerId", player.getPlayerId())
                        .orderBy("worldId asc, rankOrder asc")
+                       .findList();
+    }
+
+    private List<PlayerProfileLink> getPlayerProfileLinks(PlayerData player) {
+        return server.createQuery(PlayerProfileLink.class)
+                       .where()
+                       .eq("playerId", player.getPlayerId())
+                       .orderBy("worldId asc")
                        .findList();
     }
 
@@ -75,8 +94,8 @@ public class PlayerDataPersistAdapter extends BeanPersistAdapter {
         Transaction transaction = server.beginTransaction();
         
         PlayerData p = (PlayerData) request.getBean();
-        List<PlayerGroupLink> links = getPlayerGroupLinks(p);
-        server.delete(links.iterator(), transaction);
+        server.delete(getPlayerGroupLinks(p).iterator(), transaction);
+        server.delete(getPlayerProfileLinks(p).iterator(), transaction);
         
         server.commitTransaction();
     }
@@ -85,21 +104,37 @@ public class PlayerDataPersistAdapter extends BeanPersistAdapter {
         PlayerData p = (PlayerData) request.getBean();
         Map<WorldData, List> groups = p.getGroups();
         int rankOrder = 0;
-        PlayerGroupLink theLink = null;
+        PlayerGroupLink playerGroupLink = null;
         for (WorldData world : groups.keySet()) {
             for (GroupData group : (List<GroupData>) groups.get(world)) {
                 server.save(group);
-                theLink = server.createQuery(PlayerGroupLink.class)
-                                    .where()
-                                    .eq("playerId", p.getPlayerId())
-                                    .eq("worldId", world.getWorldId())
-                                    .eq("groupId", group.getGroupId())
-                                    .findUnique();
-                if (theLink == null) {
-                    theLink = new PlayerGroupLink(p.getPlayerId(), group.getGroupId(), world.getWorldId());
+                playerGroupLink = server.createQuery(PlayerGroupLink.class)
+                                            .where()
+                                            .eq("playerId", p.getPlayerId())
+                                            .eq("worldId", world.getWorldId())
+                                            .eq("groupId", group.getGroupId())
+                                            .findUnique();
+                if (playerGroupLink == null) {
+                    playerGroupLink = new PlayerGroupLink(p.getPlayerId(), group.getGroupId(), world.getWorldId());
                 }
-                theLink.setRankOrder(rankOrder++);
-                server.save(theLink);
+                playerGroupLink.setRankOrder(rankOrder++);
+                server.save(playerGroupLink);
+            }
+        }
+        
+        Map<WorldData, ProfileData> profiles = p.getPlayerProfile();
+        PlayerProfileLink playerProfileLink = null;
+        for (WorldData world : profiles.keySet()) {
+            server.save(profiles.get(world));
+            playerProfileLink = server.createQuery(PlayerProfileLink.class)
+                                          .where()
+                                          .eq("playerId", p.getPlayerId())
+                                          .eq("profileId", profiles.get(world).getProfileId())
+                                          .eq("worldId", world.getWorldId())
+                                          .findUnique();
+            if (playerProfileLink == null) {
+                playerProfileLink = new PlayerProfileLink(p.getPlayerId(), profiles.get(world).getProfileId(), world.getWorldId());
+                server.save(playerProfileLink);
             }
         }
     }

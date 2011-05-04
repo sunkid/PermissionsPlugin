@@ -1,5 +1,6 @@
 package com.iminurnetz.bukkit.plugin.permissions.model;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,6 +15,11 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.Version;
 
+import org.bukkit.World;
+import org.bukkit.permission.Permissions;
+
+import com.avaje.ebean.Ebean;
+import com.iminurnetz.bukkit.plugin.permissions.Profile;
 import com.iminurnetz.bukkit.plugin.permissions.util.ListChangeMonitor;
 import com.iminurnetz.bukkit.plugin.permissions.util.MonitoredList;
 
@@ -22,20 +28,25 @@ import com.iminurnetz.bukkit.plugin.permissions.util.MonitoredList;
  */
 @Entity
 @Table(name = "player_data")
-public class PlayerData implements ListChangeMonitor {
+public class PlayerData implements ListChangeMonitor, Permissions {
     @Id
     private int playerId;
     @Column(unique=true, nullable=false)
     private String name;
+    
+    @Transient
+    private Map<WorldData, ProfileData> playerProfile;
 
     private Date lastLogin;
     
     @Version
+    @Column(columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Timestamp lastUpdate;
     
     
     public PlayerData() {
         groups = new HashMap<WorldData, List>();
+        playerProfile = new HashMap<WorldData, ProfileData>();
     }
 
     public int getPlayerId() {
@@ -62,6 +73,14 @@ public class PlayerData implements ListChangeMonitor {
         this.lastLogin = lastLogin;
     }
 
+    public void setPlayerProfile(Map<WorldData, ProfileData> playerProfile) {
+        this.playerProfile = playerProfile;
+    }
+
+    public Map<WorldData, ProfileData> getPlayerProfile() {
+        return playerProfile;
+    }
+
     public void setLastUpdate(Timestamp lastUpdate) {
         this.lastUpdate = lastUpdate;
     }
@@ -83,7 +102,7 @@ public class PlayerData implements ListChangeMonitor {
         for (WorldData world : groupMap.keySet()) {
             setGroups(world, groupMap.get(world));
         }
-        onMonitoredListChange();
+        postUpdate();
     }
 
     public Map<WorldData, List> getGroups() {
@@ -95,19 +114,82 @@ public class PlayerData implements ListChangeMonitor {
         for (GroupData group : groups) {
             group.addPlayer(world, this);
         }
-        onMonitoredListChange();
+        postUpdate();
     }
     
     public List<GroupData> getGroups(WorldData world) {
         if (!groups.containsKey(world)) {
             groups.put(world, new MonitoredList<GroupData>(new ArrayList<GroupData>(), this));
-            onMonitoredListChange();
+            postUpdate();
         }
         return groups.get(world);
     }
 
-    public void onMonitoredListChange() {
+    public void postUpdate() {
         setLastUpdate(new Timestamp(new Date().getTime()));
     }
 
+    public <T> T getPermission(World world, String permission) {
+        return getPermission(world.getName(), permission);
+    }
+    
+    public <T> T getPermission(String world, String permission) {
+        WorldData worldData = getWorldData(world);
+        Profile profile = getProfileData(worldData).getProfile();
+        if (profile != null && profile.getData().containsKey(permission)) {
+            return (T) profile.getData().get(permission);
+        }
+        
+        for (GroupData group : getGroups(worldData)) {
+            for (ProfileData profileData : group.getProfiles(worldData)) {
+                profile = profileData.getProfile();
+                if (profile != null && profile.getData().containsKey(permission)) {
+                    return (T) profile.getData().get(permission);
+                }
+            }
+        }
+        
+        return null;
+    }
+
+    private ProfileData getProfileData(WorldData worldData) {
+        if (!playerProfile.containsKey(worldData)) {
+            ProfileData override = new ProfileData(getName() + "_" + worldData.getName() + "_override");
+            // Ebean.save(override);
+            playerProfile.put(worldData, override);
+        }
+        return playerProfile.get(worldData);
+    }
+
+    public boolean isPermissionSet(World world, String permission) {
+        return isPermissionSet(world.getName(), permission);
+    }
+    
+    public boolean isPermissionSet(String world, String permission) {
+        return getPermission(world, permission) != null;
+    }
+
+    public void setPermission(World world, String permission, Serializable value) {
+        setPermission(world.getName(), permission, value);
+    }
+    
+    public void setPermission(String world, String permission, Serializable value) {
+        WorldData worldData = getWorldData(world);
+        getProfileData(worldData).put(permission, value);
+        postUpdate();
+    }
+
+    public void unsetPermission(World world, String permission) {
+        unsetPermission(world.getName(), permission);
+    } 
+    
+    public void unsetPermission(String world, String permission) {
+        WorldData worldData = getWorldData(world);
+        getProfileData(worldData).remove(permission);
+        postUpdate();
+    }
+    
+    private WorldData getWorldData(String world) {
+        return Ebean.find(WorldData.class).where().eq("name", world).findUnique();
+    }
 }

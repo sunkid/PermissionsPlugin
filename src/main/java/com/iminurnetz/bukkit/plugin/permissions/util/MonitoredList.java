@@ -76,7 +76,7 @@ public class MonitoredList<E> implements List<E> {
 
     private void callPostIntercepts() {
         for (ListChangeMonitor interceptor : interceptors) {
-            interceptor.onMonitoredListChange();
+            interceptor.postUpdate();
         }
     }
 
