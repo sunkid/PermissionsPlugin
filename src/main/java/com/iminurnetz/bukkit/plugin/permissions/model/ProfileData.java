@@ -75,7 +75,6 @@ public class ProfileData {
      * @return a de-serialized copy of the stored profile.
      */
     public Profile getProfile() {
-        System.err.println("retrieving profile");
         convertProfileFromData();
         return profile;
     }
@@ -85,13 +84,11 @@ public class ProfileData {
      * @param profile the Profile to store.
      */
     public void setProfile(Profile profile) {
-        System.err.println("setting profile");
         this.profile = profile;
         convertDataFromProfile();
     }
     
     private void convertProfileFromData() {
-        System.err.println("converting profile from data " + (getData() == null ? 0 : data.length));
         if (getData() == null) {
             profile = new Profile();
         } else {
@@ -109,7 +106,6 @@ public class ProfileData {
     }
     
     private void convertDataFromProfile() {
-        System.err.println("converting data from profile " + (data == null ? 0 : data.length));
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ObjectOutputStream oos;
         try {

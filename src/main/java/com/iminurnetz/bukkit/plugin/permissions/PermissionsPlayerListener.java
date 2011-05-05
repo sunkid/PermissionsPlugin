@@ -1,6 +1,5 @@
 package com.iminurnetz.bukkit.plugin.permissions;
 
-import java.util.Date;
 import java.util.List;
 
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -27,10 +26,7 @@ public class PermissionsPlayerListener extends PlayerListener {
             p.setName(event.getPlayer().getName());
         } else {
             p = players.get(0);
-            plugin.log(p.getName() + " was last seen " + p.getLastLogin());
         }
-        
-        p.setLastLogin(new Date());
         server.save(p);
     }
 

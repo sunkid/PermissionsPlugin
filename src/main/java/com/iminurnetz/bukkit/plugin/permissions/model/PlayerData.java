@@ -30,13 +30,10 @@ public class PlayerData extends AbstractPermissionHandler {
     @Transient
     private Map<WorldData, ProfileData> playerProfile;
 
-    private Date lastLogin;
+    private int rank;
     
     private int version;
 
-    @Version
-    private int beanVersion;
-    
     public PlayerData() {
         groups = new HashMap<WorldData, List>();
         playerProfile = new HashMap<WorldData, ProfileData>();
@@ -58,20 +55,12 @@ public class PlayerData extends AbstractPermissionHandler {
         this.name = name;
     }
 
-    public Date getLastLogin() {
-        return lastLogin;
+    public void setRank(int rank) {
+        this.rank = rank;
     }
 
-    public void setLastLogin(Date lastLogin) {
-        this.lastLogin = lastLogin;
-    }
-
-    public void setBeanVersion(int beanVersion) {
-        this.beanVersion = beanVersion;
-    }
-
-    public int getBeanVersion() {
-        return beanVersion;
+    public int getRank() {
+        return rank;
     }
 
     public void setPlayerProfile(Map<WorldData, ProfileData> playerProfile) {

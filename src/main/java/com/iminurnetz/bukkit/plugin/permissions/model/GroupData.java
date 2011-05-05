@@ -29,10 +29,9 @@ public class GroupData extends AbstractPermissionHandler {
     @Column(unique=true, nullable=false)
     private String name;
     
+    private int rank;
+    
     private int version;
-
-    @Version
-    private int beanVersion;
 
     public GroupData() {
         players = new HashMap<WorldData, Set>();
@@ -59,14 +58,6 @@ public class GroupData extends AbstractPermissionHandler {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public void setBeanVersion(int beanVersion) {
-        this.beanVersion = beanVersion;
-    }
-
-    public int getBeanVersion() {
-        return beanVersion;
     }
 
     public void setVersion(int version) {
@@ -176,6 +167,14 @@ public class GroupData extends AbstractPermissionHandler {
             groupProfiles.put(worldData, override);
         }
         return groupProfiles.get(worldData);
+    }
+
+    public void setRank(int rank) {
+        this.rank = rank;
+    }
+
+    public int getRank() {
+        return rank;
     }
 
 }
