@@ -1,7 +1,5 @@
 package com.iminurnetz.bukkit.plugin.permissions.model;
 
-import java.io.Serializable;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -15,12 +13,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.Version;
 
-import org.bukkit.World;
-import org.bukkit.permission.Permissions;
-
-import com.avaje.ebean.Ebean;
 import com.iminurnetz.bukkit.plugin.permissions.Profile;
-import com.iminurnetz.bukkit.plugin.permissions.util.ListChangeMonitor;
 import com.iminurnetz.bukkit.plugin.permissions.util.MonitoredList;
 
 /**
@@ -28,7 +21,7 @@ import com.iminurnetz.bukkit.plugin.permissions.util.MonitoredList;
  */
 @Entity
 @Table(name = "player_data")
-public class PlayerData implements ListChangeMonitor, Permissions {
+public class PlayerData extends AbstractPermissionHandler {
     @Id
     private int playerId;
     @Column(unique=true, nullable=false)
@@ -39,10 +32,10 @@ public class PlayerData implements ListChangeMonitor, Permissions {
 
     private Date lastLogin;
     
+    private int version;
+
     @Version
-    @Column(columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private Timestamp lastUpdate;
-    
+    private int beanVersion;
     
     public PlayerData() {
         groups = new HashMap<WorldData, List>();
@@ -73,20 +66,29 @@ public class PlayerData implements ListChangeMonitor, Permissions {
         this.lastLogin = lastLogin;
     }
 
+    public void setBeanVersion(int beanVersion) {
+        this.beanVersion = beanVersion;
+    }
+
+    public int getBeanVersion() {
+        return beanVersion;
+    }
+
     public void setPlayerProfile(Map<WorldData, ProfileData> playerProfile) {
         this.playerProfile = playerProfile;
+        postUpdate();
     }
 
     public Map<WorldData, ProfileData> getPlayerProfile() {
         return playerProfile;
     }
 
-    public void setLastUpdate(Timestamp lastUpdate) {
-        this.lastUpdate = lastUpdate;
+    public void setVersion(int version) {
+        this.version = version;
     }
 
-    public Timestamp getLastUpdate() {
-        return lastUpdate;
+    public int getVersion() {
+        return version;
     }
 
     /**
@@ -126,13 +128,10 @@ public class PlayerData implements ListChangeMonitor, Permissions {
     }
 
     public void postUpdate() {
-        setLastUpdate(new Timestamp(new Date().getTime()));
+        setVersion(version++);
     }
 
-    public <T> T getPermission(World world, String permission) {
-        return getPermission(world.getName(), permission);
-    }
-    
+    @Override
     public <T> T getPermission(String world, String permission) {
         WorldData worldData = getWorldData(world);
         Profile profile = getProfileData(worldData).getProfile();
@@ -141,55 +140,19 @@ public class PlayerData implements ListChangeMonitor, Permissions {
         }
         
         for (GroupData group : getGroups(worldData)) {
-            for (ProfileData profileData : group.getProfiles(worldData)) {
-                profile = profileData.getProfile();
-                if (profile != null && profile.getData().containsKey(permission)) {
-                    return (T) profile.getData().get(permission);
-                }
+            if (group.getPermission(worldData.getName(), permission) != null) {
+                return (T) group.getPermission(worldData.getName(), permission);
             }
         }
         
         return null;
     }
 
-    private ProfileData getProfileData(WorldData worldData) {
+    protected ProfileData getProfileData(WorldData worldData) {
         if (!playerProfile.containsKey(worldData)) {
             ProfileData override = new ProfileData(getName() + "_" + worldData.getName() + "_override");
-            // Ebean.save(override);
             playerProfile.put(worldData, override);
         }
         return playerProfile.get(worldData);
-    }
-
-    public boolean isPermissionSet(World world, String permission) {
-        return isPermissionSet(world.getName(), permission);
-    }
-    
-    public boolean isPermissionSet(String world, String permission) {
-        return getPermission(world, permission) != null;
-    }
-
-    public void setPermission(World world, String permission, Serializable value) {
-        setPermission(world.getName(), permission, value);
-    }
-    
-    public void setPermission(String world, String permission, Serializable value) {
-        WorldData worldData = getWorldData(world);
-        getProfileData(worldData).put(permission, value);
-        postUpdate();
-    }
-
-    public void unsetPermission(World world, String permission) {
-        unsetPermission(world.getName(), permission);
-    } 
-    
-    public void unsetPermission(String world, String permission) {
-        WorldData worldData = getWorldData(world);
-        getProfileData(worldData).remove(permission);
-        postUpdate();
-    }
-    
-    private WorldData getWorldData(String world) {
-        return Ebean.find(WorldData.class).where().eq("name", world).findUnique();
     }
 }

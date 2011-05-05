@@ -1,9 +1,7 @@
 package com.iminurnetz.bukkit.plugin.permissions.model;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -17,28 +15,36 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.Version;
 
-import com.iminurnetz.bukkit.plugin.permissions.util.ListChangeMonitor;
+import com.iminurnetz.bukkit.plugin.permissions.Profile;
+import com.iminurnetz.bukkit.plugin.permissions.util.MonitoredList;
 
 /**
  * This entity represents a group with a set of world-specific players and a list of world-specific profiles. 
  */
 @Entity
 @Table(name = "group_data")
-public class GroupData  implements ListChangeMonitor {
+public class GroupData extends AbstractPermissionHandler {
     @Id
     private int groupId;
     @Column(unique=true, nullable=false)
     private String name;
     
+    private int version;
+
     @Version
-    @Column(columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private Timestamp lastUpdate;
+    private int beanVersion;
 
     public GroupData() {
         players = new HashMap<WorldData, Set>();
         profiles = new HashMap<WorldData, List>();
+        groupProfiles = new HashMap<WorldData, ProfileData>();
     }
     
+    public GroupData(String name) {
+        this();
+        this.name = name;
+    }
+
     public int getGroupId() {
         return groupId;
     }
@@ -55,12 +61,20 @@ public class GroupData  implements ListChangeMonitor {
         this.name = name;
     }
 
-    public void setLastUpdate(Timestamp lastUpdate) {
-        this.lastUpdate = lastUpdate;
+    public void setBeanVersion(int beanVersion) {
+        this.beanVersion = beanVersion;
     }
 
-    public Timestamp getLastUpdate() {
-        return lastUpdate;
+    public int getBeanVersion() {
+        return beanVersion;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
+    }
+
+    public int getVersion() {
+        return version;
     }
 
     /**
@@ -78,6 +92,9 @@ public class GroupData  implements ListChangeMonitor {
      */
     @Transient
     private Map<WorldData, List> profiles;
+    
+    @Transient
+    private Map<WorldData, ProfileData> groupProfiles;
     
     public Map<WorldData, Set> getPlayers() {
         return players;
@@ -116,8 +133,7 @@ public class GroupData  implements ListChangeMonitor {
     
     public List<ProfileData> getProfiles(WorldData world) {
         if (!profiles.containsKey(world)) {
-            List<ProfileData> l = new ArrayList<ProfileData>();
-            profiles.put(world, l);
+            profiles.put(world, new MonitoredList<ProfileData>(new ArrayList<ProfileData>(), this));
             postUpdate();
         }
         return profiles.get(world);
@@ -128,7 +144,38 @@ public class GroupData  implements ListChangeMonitor {
         postUpdate();
     }
 
-    public void postUpdate() {
-        setLastUpdate(new Timestamp(new Date().getTime()));
+    public void setGroupProfiles(Map<WorldData, ProfileData> groupProfile) {
+        this.groupProfiles = groupProfile;
+        postUpdate();
     }
+
+    public Map<WorldData, ProfileData> getGroupProfiles() {
+        return groupProfiles;
+    }
+
+    public <T> T getPermission(String world, String permission) {
+        WorldData worldData = getWorldData(world);
+        Profile profile = getProfileData(worldData).getProfile();
+        if (profile != null && profile.getData().containsKey(permission)) {
+            return (T) profile.getData().get(permission);
+        }
+
+        for (ProfileData profileData : getProfiles(worldData)) {
+            profile = profileData.getProfile();
+            if (profile != null && profile.getData().containsKey(permission)) {
+                return (T) profile.getData().get(permission);
+            }
+        }
+        
+        return null;
+    }
+
+    public ProfileData getProfileData(WorldData worldData) {
+        if (!groupProfiles.containsKey(worldData)) {
+            ProfileData override = new ProfileData(getName() + "_" + worldData.getName() + "_override");
+            groupProfiles.put(worldData, override);
+        }
+        return groupProfiles.get(worldData);
+    }
+
 }

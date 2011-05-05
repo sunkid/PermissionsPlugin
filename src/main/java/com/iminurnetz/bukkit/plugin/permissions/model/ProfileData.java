@@ -6,19 +6,18 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.sql.Timestamp;
-import java.util.Date;
 
 import javax.persistence.Basic;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
-import javax.persistence.Column;
-import javax.persistence.Version;
+import javax.persistence.Transient;
 
 import com.iminurnetz.bukkit.plugin.permissions.Profile;
+
 
 /**
  * This entity persists profile data as a serialized java object to the database. 
@@ -35,14 +34,15 @@ public class ProfileData {
     @Basic(fetch=FetchType.EAGER)
     private byte[] data;
     
-    @Version
-    @Column(columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private Timestamp lastUpdate;
+    @Transient
+    private Profile profile;
 
     public ProfileData() {
+        profile = new Profile();
     }
     
     public ProfileData(String name) {
+        this();
         this.name = name;
     }
     
@@ -70,34 +70,14 @@ public class ProfileData {
         return data;
     }
 
-    public Timestamp getLastUpdate() {
-        return lastUpdate;
-    }
-
-    public void setLastUpdate(Timestamp lastUpdate) {
-        this.lastUpdate = lastUpdate;
-    }
-
     /**
      * Retrieve a copy of the stored profile.
      * @return a de-serialized copy of the stored profile.
      */
     public Profile getProfile() {
-        if (getData() == null) {
-            return new Profile();
-        }
-        
-        ObjectInputStream ois;
-        try {
-            ois = new ObjectInputStream(new ByteArrayInputStream(getData()));
-            Object o = ois.readObject();
-            ois.close();
-            return (Profile) o;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return null;
+        System.err.println("retrieving profile");
+        convertProfileFromData();
+        return profile;
     }
 
     /**
@@ -105,29 +85,56 @@ public class ProfileData {
      * @param profile the Profile to store.
      */
     public void setProfile(Profile profile) {
+        System.err.println("setting profile");
+        this.profile = profile;
+        convertDataFromProfile();
+    }
+    
+    private void convertProfileFromData() {
+        System.err.println("converting profile from data " + (getData() == null ? 0 : data.length));
+        if (getData() == null) {
+            profile = new Profile();
+        } else {
+            ObjectInputStream ois;
+            try {
+                ois = new ObjectInputStream(new ByteArrayInputStream(getData()));
+                Object o = ois.readObject();
+                ois.close();
+                profile = (Profile) o;
+            } catch (Exception e) {
+                e.printStackTrace(System.err);
+                profile = null;
+            }
+        }
+    }
+    
+    private void convertDataFromProfile() {
+        System.err.println("converting data from profile " + (data == null ? 0 : data.length));
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ObjectOutputStream oos;
         try {
             oos = new ObjectOutputStream(baos);
             oos.writeObject(profile);
             oos.close();
-            setData(baos.toByteArray());
+            data = baos.toByteArray();
         } catch (IOException e) {
-            e.printStackTrace();
-            setData(null);
+            e.printStackTrace(System.err);
+            data = null;
         }
-        setLastUpdate(new Timestamp(new Date().getTime()));
     }
 
     public void put(String permission, Serializable value) {
-        Profile profile = getProfile();
         profile.getData().put(permission, value);
-        setProfile(profile);
+        convertDataFromProfile();
     }
 
     public void remove(String permission) {
-        Profile profile = getProfile();
         profile.getData().remove(permission);
-        setProfile(profile);
+        convertDataFromProfile();
+    }
+
+    public <T> T get(String permission) {
+        convertProfileFromData();
+        return (T) profile.getData().get(permission);
     }
 }

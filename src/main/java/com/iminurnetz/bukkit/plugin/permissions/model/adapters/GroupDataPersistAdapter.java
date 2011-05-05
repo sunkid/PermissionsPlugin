@@ -30,7 +30,7 @@ public class GroupDataPersistAdapter extends BeanPersistAdapter {
     public void postLoad(Object bean, Set<String> includedProperties) {
         GroupData group = (GroupData) bean;
         int worldId = -1;
-        WorldData world;
+        WorldData world = null;
         
         Set<PlayerData> players = null;
         Map<WorldData, Set> playerMap = new HashMap<WorldData, Set>();
@@ -48,7 +48,9 @@ public class GroupDataPersistAdapter extends BeanPersistAdapter {
         
         List<ProfileData> profiles = null;
         Map<WorldData, List> profileMap = new HashMap<WorldData, List>();
+        Map<WorldData, ProfileData> overrideMap = new HashMap<WorldData, ProfileData>();
         worldId = -1;
+        ProfileData profile = null;
         for (GroupProfileLink l : getGroupProfileLinks(group)) {
             if (worldId != l.getWorldId()) {
                 worldId = l.getWorldId();
@@ -57,12 +59,18 @@ public class GroupDataPersistAdapter extends BeanPersistAdapter {
                 profileMap.put(world, profiles);
             }
             
-            profiles.add(server.getReference(ProfileData.class, l.getProfileId()));
+            profile = server.getReference(ProfileData.class, l.getProfileId());
+            if (l.getRankOrder() == -1) {
+                overrideMap.put(world, profile);
+            } else {
+                profiles.add(profile);
+            }
         }
         
-        Timestamp lastUpdate = group.getLastUpdate();
+        int version = group.getVersion();
+        group.setGroupProfiles(overrideMap);
         group.setProfiles(profileMap);
-        group.setLastUpdate(lastUpdate);
+        group.setVersion(version);
     }
     
     private List<GroupProfileLink> getGroupProfileLinks(GroupData group) {
@@ -111,8 +119,7 @@ public class GroupDataPersistAdapter extends BeanPersistAdapter {
             }
         }
         
-        List<GroupProfileLink> ppl = getGroupProfileLinks(g);
-        server.delete(ppl.iterator(), transaction);
+        server.delete(getGroupProfileLinks(g).iterator(), transaction);
         
         server.commitTransaction();
     }
@@ -121,24 +128,31 @@ public class GroupDataPersistAdapter extends BeanPersistAdapter {
         GroupData g = (GroupData) request.getBean();
         Map<WorldData, List> profiles = g.getProfiles();
         int rankOrder = 0;
-        GroupProfileLink theLink = null;
         for (WorldData world : profiles.keySet()) {
             for (ProfileData profile : (List<ProfileData>) profiles.get(world)) {
-                server.save(profile);
-                theLink = server.createQuery(GroupProfileLink.class)
-                                    .where()
-                                    .eq("groupId", g.getGroupId())
-                                    .eq("worldId", world.getWorldId())
-                                    .eq("profileId", profile.getProfileId())
-                                    .findUnique();
-                if (theLink == null) {
-                    theLink = new GroupProfileLink(g.getGroupId(), profile.getProfileId(), world.getWorldId()); 
-                }
-                
-                theLink.setRankOrder(rankOrder++);
-                server.save(theLink);
+                updateLink(g, profile, world, rankOrder++);
             }
         }
+        
+        for (WorldData world : g.getGroupProfiles().keySet()) {
+            updateLink(g, g.getGroupProfiles().get(world), world, -1);
+        }
+    }
+
+    private void updateLink(GroupData group, ProfileData profile, WorldData world, int rankOrder) {
+        server.save(profile);
+        GroupProfileLink theLink = server.createQuery(GroupProfileLink.class)
+                                            .where()
+                                            .eq("groupId", group.getGroupId())
+                                            .eq("worldId", world.getWorldId())
+                                            .eq("profileId", profile.getProfileId())
+                                            .findUnique();
+        if (theLink == null) {
+            theLink = new GroupProfileLink(group.getGroupId(), profile.getProfileId(), world.getWorldId()); 
+        }
+        
+        theLink.setRankOrder(rankOrder++);
+        server.save(theLink);
     }
 
     public static void setServer(EbeanServer server) {

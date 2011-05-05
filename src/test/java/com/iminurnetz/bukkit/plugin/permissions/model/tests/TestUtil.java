@@ -1,5 +1,6 @@
 package com.iminurnetz.bukkit.plugin.permissions.model.tests;
 
+import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.EbeanServerFactory;
 import com.avaje.ebean.config.ServerConfig;
@@ -17,7 +18,7 @@ import com.iminurnetz.bukkit.plugin.permissions.model.adapters.PlayerDataPersist
 
 import junit.framework.TestCase;
 
-public class TestUtil extends TestCase {
+public abstract class TestUtil extends TestCase {
     public TestUtil() {
         ServerConfig config = new ServerConfig();
         config.setName("mysql");
@@ -43,7 +44,24 @@ public class TestUtil extends TestCase {
         gen.runScript(true, gen.generateCreateDdl());
     }
     
-    public void test() {
-        assertTrue(true);
+    protected PlayerData player;
+    protected WorldData world;
+    
+    public void setUp() {
+        player = Ebean.find(PlayerData.class).where().ieq("name", "sunkid").findUnique();
+        if (player == null) {
+            player = new PlayerData();
+            player.setName("sunkid");
+            Ebean.save(player);
+        }
+        
+        world = Ebean.find(WorldData.class).where().ieq("name", "world").findUnique();
+        if (world == null) {
+            world = new WorldData();
+            world.setName("world");
+            Ebean.save(world);
+        }
+        
     }
+    
 }

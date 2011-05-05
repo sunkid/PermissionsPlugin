@@ -40,7 +40,7 @@ public class PlayerDataPersistAdapter extends BeanPersistAdapter {
                 groupMap.put(world, groupList);
             }
             
-            groupList.add(server.getReference(GroupData.class, l.getGroupId()));
+            groupList.add(server.find(GroupData.class, l.getGroupId()));
         }
         
         Map<WorldData, ProfileData> profiles = new HashMap<WorldData, ProfileData>();
@@ -51,10 +51,10 @@ public class PlayerDataPersistAdapter extends BeanPersistAdapter {
             profiles.put(world, profile);
         }
         
-        Timestamp lastUpdate = player.getLastUpdate();
+        int version = player.getVersion();
         player.setGroups(groupMap);
         player.setPlayerProfile(profiles);
-        player.setLastUpdate(lastUpdate);        
+        player.setVersion(version);        
     }
     
     private List<PlayerGroupLink> getPlayerGroupLinks(PlayerData player) {

@@ -16,6 +16,13 @@ public class WorldData {
     @Column(unique=true, nullable=false)
     private String name;
 
+    public WorldData() {
+    }
+    
+    public WorldData(String name) {
+        this.name = name;
+    }
+
     public int getWorldId() {
         return worldId;
     }

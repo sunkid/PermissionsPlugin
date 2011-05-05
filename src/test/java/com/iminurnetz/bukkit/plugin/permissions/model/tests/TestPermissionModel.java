@@ -18,10 +18,6 @@ public class TestPermissionModel extends TestUtil {
     }
 
     public void testPlayerModel() {
-        PlayerData player = new PlayerData();
-        player.setName("sunkid");
-        Ebean.save(player);
-        
         PlayerData p = Ebean.find(PlayerData.class, player.getPlayerId());
         assertEquals(player.getName(), p.getName());
         
@@ -31,14 +27,6 @@ public class TestPermissionModel extends TestUtil {
     }
     
     public void testPlayerGroupLink() {
-        PlayerData player = new PlayerData();
-        player.setName("sunkid");
-        Ebean.save(player);
-        
-        WorldData world = new WorldData();
-        world.setName("world");
-        Ebean.save(world);
-        
         List<GroupData> groups = new ArrayList<GroupData>();
         for (int n = 1; n <= 10; n++) {
             GroupData group = new GroupData();

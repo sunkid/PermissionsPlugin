@@ -9,83 +9,83 @@ import java.util.ListIterator;
 public class MonitoredList<E> implements List<E> {
 
     private List<E> backer;
-    private List<ListChangeMonitor> interceptors = new LinkedList<ListChangeMonitor>();
+    private List<ListChangeMonitor> monitors = new LinkedList<ListChangeMonitor>();
 
-    public MonitoredList(List<E> backer, ListChangeMonitor interceptor) {
+    public MonitoredList(List<E> backer, ListChangeMonitor monitor) {
         this.backer = backer;
-        interceptors.add(interceptor);
+        monitors.add(monitor);
     }
 
     public boolean add(E e) {
         boolean returnValue = backer.add(e);
-        callPostIntercepts();
+        callPostUpdates();
         return returnValue;
     }
 
     public boolean remove(Object o) {
         boolean returnValue = backer.remove(o);
-        callPostIntercepts();
+        callPostUpdates();
         return returnValue;
     }
 
     public boolean addAll(Collection<? extends E> c) {
         boolean returnValue = backer.addAll(c);
-        callPostIntercepts();
+        callPostUpdates();
         return returnValue;
     }
 
     public boolean addAll(int index, Collection<? extends E> c) {
         boolean returnValue = backer.addAll(index, c);
-        callPostIntercepts();
+        callPostUpdates();
         return returnValue;
     }
 
     public boolean removeAll(Collection<?> c) {
         boolean returnValue = backer.removeAll(c);
-        callPostIntercepts();
+        callPostUpdates();
         return returnValue;
     }
 
     public boolean retainAll(Collection<?> c) {
         boolean returnValue = backer.retainAll(c);
-        callPostIntercepts();
+        callPostUpdates();
         return returnValue;
     }
 
     public void clear() {
         backer.clear();
-        callPostIntercepts();
+        callPostUpdates();
     }
 
     public E set(int index, E element) {
         E returnValue = backer.set(index, element);
-        callPostIntercepts();
+        callPostUpdates();
         return returnValue;
     }
 
     public void add(int index, E element) {
         backer.add(index, element);
-        callPostIntercepts();
+        callPostUpdates();
     }
 
     public E remove(int index) {
         E returnValue = backer.remove(index);
-        callPostIntercepts();
+        callPostUpdates();
         return returnValue;
     }
 
-    private void callPostIntercepts() {
-        for (ListChangeMonitor interceptor : interceptors) {
-            interceptor.postUpdate();
+    private void callPostUpdates() {
+        for (ListChangeMonitor monitor : monitors) {
+            monitor.postUpdate();
         }
     }
 
-    public boolean addInterceptor(ListChangeMonitor interceptor) {
-        return interceptors.add(interceptor);
+    public boolean addMonitor(ListChangeMonitor monitor) {
+        return monitors.add(monitor);
     }
 
-    public boolean removeInterceptor(ListChangeMonitor interceptor) {
-        return interceptors.remove(interceptor);
+    public boolean removeMonitor(ListChangeMonitor monitor) {
+        return monitors.remove(monitor);
     }
 
     public int size() {
