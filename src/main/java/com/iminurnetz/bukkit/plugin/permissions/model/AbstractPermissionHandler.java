@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import org.bukkit.World;
 import org.bukkit.permission.Permissions;
+import org.bukkit.permission.Rank;
 
 import com.avaje.ebean.Ebean;
 import com.iminurnetz.bukkit.plugin.permissions.util.ListChangeMonitor;
@@ -11,7 +12,7 @@ import com.iminurnetz.bukkit.plugin.permissions.util.ListChangeMonitor;
 import javax.persistence.Entity;
 
 @Entity
-public abstract class AbstractPermissionHandler implements ListChangeMonitor, Permissions  {
+public abstract class AbstractPermissionHandler implements ListChangeMonitor, Permissions, Rank  {
 
     public <T> T getPermission(World world, String permission) {
         return (T) getPermission(world.getName(), permission);

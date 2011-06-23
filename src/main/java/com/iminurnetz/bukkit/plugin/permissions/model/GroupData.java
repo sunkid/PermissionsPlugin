@@ -13,7 +13,6 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-import javax.persistence.Version;
 
 import com.iminurnetz.bukkit.plugin.permissions.Profile;
 import com.iminurnetz.bukkit.plugin.permissions.util.MonitoredList;
